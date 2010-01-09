@@ -49,14 +49,9 @@ public class Jamud implements Initializable {
 
 
     // the Singleton
-    private static Jamud instance;
+    private static Jamud instance = new Jamud();
 
-    public synchronized static final Jamud currentInstance() {
-
-	if(Jamud.instance == null) {
-	    Jamud.instance = new Jamud();
-	}
-
+    public static final Jamud currentInstance() {
 	return Jamud.instance;
     }
 
