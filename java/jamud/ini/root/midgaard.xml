@@ -1,0 +1,33 @@
+
+<OBJECT NAME="MIDGAARD" TID="midg root">
+    <DESC SHORT="Midgaard Area" />
+
+    <INSIDE NAME="MIDGAARD">
+    <DESC SHORT="MIDGAARD" />
+
+
+    <OBJECT NAME="midg 001" TID="midg 001" TEMPLATE="true">
+    <INSIDE>
+        <DESC SHORT="In Front of the Gates of Midgaard">
+	You stand in awe, cowering before the mighty gates of midgaard. It's
+	not just amazing, it's awe-inspiring. It's tremendous, stupendous, and
+	insanely super-duper! Now take your medicine and go to bed.
+	</DESC>
+	<ENTRANCE CLASS="jamud.object.Entrance$North" TARGET="midg 002" />
+    </INSIDE>
+    </OBJECT>
+
+
+    <OBJECT NAME="midg 002" TID="midg 002" TEMPLATE="true">
+    <INSIDE>
+        <DESC SHORT="In the Central Square">
+	Look! All around you is Midgaard. Just pretend you see it. Are you
+	impressed?
+	</DESC>
+	<ENTRANCE CLASS="jamud.object.Entrance$South" TARGET="midg 001" />
+    </INSIDE>
+    </OBJECT>
+
+
+    </INSIDE>
+</OBJECT>
