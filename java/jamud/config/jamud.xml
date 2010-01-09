@@ -1,20 +1,33 @@
-
 <JAMUD>
 
 
     <MESSAGE NAME="jamud.title">namelessmoo</MESSAGE>
     <MESSAGE NAME="jamud.id">namelessmoo_id</MESSAGE>
-    <MESSAGE NAME="jamud.openscreen" SRC="ini/jamud.open.txt" />
-    <MESSAGE NAME="jamud.closescreen" SRC="ini/jamud.close.txt" />
-    <MESSAGE NAME="jamud.motd" SRC="ini/jamud.motd.txt" />
+    <MESSAGE NAME="jamud.openscreen" SRC="config/jamud.open.txt" />
+    <MESSAGE NAME="jamud.closescreen" SRC="config/jamud.close.txt" />
+    <MESSAGE NAME="jamud.motd" SRC="config/jamud.motd.txt" />
 
 
 
-    <PLAYERMANAGER PATH="ini/players/" />
+    <PLAYERMANAGER PATH="config/players/" />
 
 
-    <PLUGIN CLASS="com.jamud.connections.StandardServer" AUTO="TRUE">
+<!--
+    <PLUGIN CLASS="com.jamud.connections.SocketServer" AUTO="TRUE">
         <SET KEY="PORT" TYPE="INT" VALUE="8808" />
+    </PLUGIN>
+-->
+    <PLUGIN CLASS="com.jamud.connections.ChatMultiplexorGateway" AUTO="TRUE">
+    	<!-- VALUE must point to ChatConnectorLauncher.properties from openwood googlecode project -->
+        <SET KEY="cmprop" TYPE="STRING" VALUE="/home/keep/namelessmoo/cm.prop" />
+
+    	<!-- to disable connectors, just comment them out with xml comments -->
+        <!--
+	        <SET KEY="connector.icq.icq1" TYPE="STRING" VALUE="" />
+        	<SET KEY="connector.googletalk.gtalk1" TYPE="STRING" VALUE="" />
+        	<SET KEY="connector.jabber.jabberru1" TYPE="STRING" VALUE="" />
+        	<SET KEY="connector.irc.rusnet1" TYPE="STRING" VALUE="" />
+        -->
     </PLUGIN>
 
     <PLUGIN CLASS="com.jamud.creation.StandardCreation" AUTO="TRUE">
@@ -29,8 +42,8 @@
     <PLUGIN CLASS="com.jamud.commands.MudObjectCommandsPlugin" AUTO="TRUE" />
 
     <PLUGIN CLASS="com.jamud.commands.SocialsPlugin" AUTO="TRUE">
-        <SOCIALS SRC="ini/socials.xml" />
-	<SOCIALS SRC="ini/socials.new.xml" />
+        <SOCIALS SRC="config/socials.xml" />
+	<SOCIALS SRC="config/socials.new.xml" />
     </PLUGIN>
 
     <PLUGIN CLASS="com.jamud.commands.PlayerCommandsPlugin" AUTO="TRUE" />
@@ -46,7 +59,7 @@
 	nothing. The border between chaos and reality.
 	</DESC>
 
-        <OBJECT SRC="ini/root/midgaard.xml" />
+        <OBJECT SRC="config/root/midgaard.xml" />
 
 	<ENTRANCE CLASS="Down" TARGET="midg 001" />
     </ROOT>

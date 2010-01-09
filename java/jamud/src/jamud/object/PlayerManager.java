@@ -1,178 +1,200 @@
 package jamud.object;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
-import jamud.object.event.*;
-import jamud.util.*;
-import java.util.*;
-import net.n3.nanoxml.*;
+import net.n3.nanoxml.IXMLElement;
+import net.n3.nanoxml.XMLElement;
 
+import jamud.object.event.EventRegister;
+import jamud.object.event.JamudEvent;
+import jamud.object.event.JamudEventListener;
+import jamud.object.event.JamudEventTrigger;
+import jamud.object.event.PlayerMaskLoginEvent;
+import jamud.object.event.PlayerMaskLogoutEvent;
+import jamud.util.Attributes;
 
 public class PlayerManager implements JamudEventTrigger {
 
-    
-    public static final String
-	MARKUP = "PLAYERMANAGER";
-    
 
-    private static final String
+	public static final String
+	MARKUP = "PLAYERMANAGER";
+
+
+	private static final String
 	PROPERTY_PATH = "PATH",
 	PROPERTY_TIMEOUT = "TIMEOUT";
 
 
-    private String path;
+	private String path;
 
-    public String getPath() {
-	return this.path;
-    }
-
-
-    private long timeout;
-
-    public long getTimeout() {
-	return this.timeout;
-    }
-
-
-    
-    // collection of PlayerMasks
-    private Set masks;
-    
-    public PlayerMask getPlayerMask(String name) {
-	if(name == null || name.length() == 0) {
-	    return null;
+	public String getPath() {
+		return this.path;
 	}
 
-	for(Iterator i = masks.iterator(); i.hasNext(); ) {
-	    PlayerMask p = (PlayerMask) i.next();
-	    if( p.getName().equalsIgnoreCase(name) ) {
+
+	private long timeout;
+
+	public long getTimeout() {
+		return this.timeout;
+	}
+
+
+
+	// collection of PlayerMasks
+	private Set masks;
+
+	public PlayerMask getPlayerMask(String name) {
+		if(name == null || name.length() == 0) {
+			return null;
+		}
+
+		for(Iterator i = masks.iterator(); i.hasNext(); ) {
+			PlayerMask p = (PlayerMask) i.next();
+			if( p.getName().equalsIgnoreCase(name) ) {
+				return p;
+			}
+		}
+		return null;
+	}
+
+	public PlayerMask getOrCreatePlayerMask(String name,Connection c) {
+		if(name == null || name.length() == 0) {
+			return null;
+		}
+
+		PlayerMask pm=getPlayerMask(name);
+		if(pm!=null)return pm;
+		Player p=new Player(c);
+		p.setShortName(name);
+		addPlayerMask(p);
 		return p;
-	    }
-	}
-	return null;
-    }
-
-    public boolean addPlayerMask(PlayerMask p) {
-	return masks.add(p);
-    }
-
-    public boolean removePlayerMask(String name) {
-	if(name == null || name.length() == 0) {
-	    return false;
 	}
 
-	for(Iterator i = masks.iterator(); i.hasNext(); ) {
-	    PlayerMask p = (PlayerMask) i.next();
-	    if(p.getName().equalsIgnoreCase(name)) {
-		i.remove();
-		return true;
-	    }
+	public boolean addPlayerMask(PlayerMask p) {
+		return masks.add(p);
 	}
-	return false;
-    }
 
-    public boolean removePlayerMask(PlayerMask p) {
-	return masks.remove(p);
-    }
+	public boolean removePlayerMask(String name) {
+		if(name == null || name.length() == 0) {
+			return false;
+		}
 
-
-    // The Event Register (for JamudEventTrigger)
-    private EventRegister events = new EventRegister();
-
-    public boolean addListener(JamudEventListener listener,
-			    Class eventClass) {
-	return events.addListener(listener, eventClass);
-    }
-
-    public boolean removeListener(JamudEventListener listener) {
-	return events.removeListener(listener);
-    }
-
-    public boolean removeListener(JamudEventListener listener,
-			       Class eventClass) {
-	return events.removeListener(listener, eventClass);
-    }
-
-    public boolean removeListeners() {
-	return events.removeListeners();
-    }
-
-    public boolean removeListeners(Class eventClass) {
-	return events.removeListeners(eventClass);
-    }
-
-    public void triggerListeners(JamudEvent event) {
-	events.triggerListeners(event);
-    }
-
-
-
-    public PlayerManager() {
-	this.masks = Collections.synchronizedSet(new HashSet());
-    }
-
-
-
-    public boolean logPlayerMaskIn(PlayerMask p) {
-	if(masks.add(p)) {
-	    JamudEvent ev = new PlayerMaskLoginEvent(p);
-	    events.triggerListeners(ev);
-	    return true;
-	} else {
-	    return false;
+		for(Iterator i = masks.iterator(); i.hasNext(); ) {
+			PlayerMask p = (PlayerMask) i.next();
+			if(p.getName().equalsIgnoreCase(name)) {
+				i.remove();
+				return true;
+			}
+		}
+		return false;
 	}
-    }
 
-
-    public boolean logPlayerMaskOut(PlayerMask p, int reason) {
-	if(masks.remove(p)) {
-	    JamudEvent ev = new PlayerMaskLogoutEvent(p);
-	    events.triggerListeners(ev);
-	    return true;
-	} else {
-	    return false;
+	public boolean removePlayerMask(PlayerMask p) {
+		return masks.remove(p);
 	}
-    }
 
 
-    public void logOutInactives() {
-	long nt = System.currentTimeMillis();
+	// The Event Register (for JamudEventTrigger)
+	private EventRegister events = new EventRegister();
 
-	for(Iterator i = masks.iterator(); i.hasNext(); ) {
-	    PlayerMask pm = (PlayerMask) i.next();
-	    if(pm.isLocal() && pm instanceof Player) {
-		Player p = (Player) pm;
-		if( p.getConnection() == null &&
-		    nt - p.lastCommandAt() >= this.timeout )
-		    p.terminate(Player.LOGOUT_LINKDEATH);
-	    }
+	public boolean addListener(JamudEventListener listener,
+			Class eventClass) {
+		return events.addListener(listener, eventClass);
 	}
-    }
 
-
-    public void load(IXMLElement xml) {
-	Attributes a = new Attributes( xml.getAttributes() );
-	
-	String p = a.getAttribute( PROPERTY_PATH, "/" );
-	final char c = p.charAt( p.length() - 1 );
-	if( c != '/' ) {
-	    p = p.concat( "/" );
+	public boolean removeListener(JamudEventListener listener) {
+		return events.removeListener(listener);
 	}
-	this.path = p;
 
-	this.timeout = a.getAttribute( PROPERTY_TIMEOUT, (long)60000 );
-    }
+	public boolean removeListener(JamudEventListener listener,
+			Class eventClass) {
+		return events.removeListener(listener, eventClass);
+	}
+
+	public boolean removeListeners() {
+		return events.removeListeners();
+	}
+
+	public boolean removeListeners(Class eventClass) {
+		return events.removeListeners(eventClass);
+	}
+
+	public void triggerListeners(JamudEvent event) {
+		events.triggerListeners(event);
+	}
 
 
-    public IXMLElement toXMLElement() {
-	IXMLElement xml = new XMLElement(MARKUP);
-	toXMLElement( xml );
-	return xml;
-    }
+
+	public PlayerManager() {
+		this.masks = Collections.synchronizedSet(new HashSet());
+	}
 
 
-    public void toXMLElement(IXMLElement xml) {
-	xml.setAttribute( PROPERTY_PATH, this.path );
-	xml.setAttribute( PROPERTY_TIMEOUT, Long.toString(this.timeout) );
-    }
-    
+
+	public boolean logPlayerMaskIn(PlayerMask p) {
+		if(masks.add(p)) {
+			JamudEvent ev = new PlayerMaskLoginEvent(p);
+			events.triggerListeners(ev);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+
+	public boolean logPlayerMaskOut(PlayerMask p, int reason) {
+		if(masks.remove(p)) {
+			JamudEvent ev = new PlayerMaskLogoutEvent(p);
+			events.triggerListeners(ev);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+
+	public void logOutInactives() {
+		long nt = System.currentTimeMillis();
+
+		for(Iterator i = masks.iterator(); i.hasNext(); ) {
+			PlayerMask pm = (PlayerMask) i.next();
+			if(pm.isLocal() && pm instanceof Player) {
+				Player p = (Player) pm;
+				if( p.getConnection() == null &&
+						nt - p.lastCommandAt() >= this.timeout )
+					p.terminate(Player.LOGOUT_LINKDEATH);
+			}
+		}
+	}
+
+
+	public void load(IXMLElement xml) {
+		Attributes a = new Attributes( xml.getAttributes() );
+
+		String p = a.getAttribute( PROPERTY_PATH, "/" );
+		final char c = p.charAt( p.length() - 1 );
+		if( c != '/' ) {
+			p = p.concat( "/" );
+		}
+		this.path = p;
+
+		this.timeout = a.getAttribute( PROPERTY_TIMEOUT, (long)60000 );
+	}
+
+
+	public IXMLElement toXMLElement() {
+		IXMLElement xml = new XMLElement(MARKUP);
+		toXMLElement( xml );
+		return xml;
+	}
+
+
+	public void toXMLElement(IXMLElement xml) {
+		xml.setAttribute( PROPERTY_PATH, this.path );
+		xml.setAttribute( PROPERTY_TIMEOUT, Long.toString(this.timeout) );
+	}
+
 }

@@ -38,7 +38,7 @@ public class Player extends PlayerMask implements Initializable, Actor {
 	public static final int
 	LOGOUT_NORMAL = 0,    // through the quit command, etc
 	LOGOUT_BOOTED = 1,    // happens when manually booted
-	LOGOUT_LINKDEATH = 2, // happends when the PlayerManager boots you
+	LOGOUT_LINKDEATH = 2, // happens when the PlayerManager boots you
 	LOGOUT_ERROR = 3;     // connection broken
 
 
@@ -363,7 +363,7 @@ public class Player extends PlayerMask implements Initializable, Actor {
 
 
 
-	public Player() {
+	private Player() {
 		this.granted = new FlagList();
 		this.channels = new FlagList();
 		this.commandBuffer = new Queue();
