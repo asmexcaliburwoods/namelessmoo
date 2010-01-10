@@ -1,17 +1,16 @@
 package com.jamud.connections;
 
 
-import java.net.Socket;
-import java.util.Map;
-
-import openwood.chat.ChatConnector;
-import openwood.chat.impl.ChatConnectorLauncher;
-
 import jamud.object.Player;
 import jamud.plugin.JamudPlugin;
 
-public class ChatMultiplexorGateway extends JamudPlugin {
-	private static final String PARAM_PREFIX_CONNECTOR = "connector.";
+import java.rmi.RemoteException;
+
+import openwood.chat.impl.ChatConnectorLauncher;
+import openwood.chat.impl.ChatMultiplexorLink;
+
+public class ChatMultiplexorGateway extends JamudPlugin{
+//	private static final String PARAM_PREFIX_CONNECTOR = "connector.";
 	private static final String PARAM_CMPROP = "cmprop";
 
 	public final String getName() {return ChatMultiplexorGateway.class.getSimpleName();}
@@ -22,14 +21,11 @@ public class ChatMultiplexorGateway extends JamudPlugin {
 
 	public final String getInfo() {return "Allows for misc. connections.";}
 
-
-	private ChatMultiplexorGatewayThread thread=new ChatMultiplexorGatewayThread();
-
-
 	private ChatMultiplexorGatewayListener listener;
 
-
 	private int state = STATE_TERMINATED;
+	protected ChatMultiplexorLink chatlink;
+	private ChatMultiplexorChatConnDispatcher dispatcher;
 
 	public int initializableState() {
 		return this.state;
@@ -37,7 +33,7 @@ public class ChatMultiplexorGateway extends JamudPlugin {
 
 
 
-	public ChatMultiplexorGateway() {
+	public ChatMultiplexorGateway() throws RemoteException {
 		super();
 
 		this.listener = new ChatMultiplexorGatewayListener() {
@@ -77,13 +73,18 @@ public class ChatMultiplexorGateway extends JamudPlugin {
 					@Override
 					public void run() {
 						try{
-							ChatConnectorLauncher.main(new String[]{cmproplocation});
-							for(Map.Entry<String,ChatConnector> pair:
-								ChatConnectorLauncher.getConnectors().entrySet()){
-								String key=pair.getKey();
-								ChatConnector ccon=pair.getValue();
-								new ChatMultiplexorChatConnDispatcher(key,ccon,listener);
-							}
+							dispatcher=new ChatMultiplexorChatConnDispatcher(listener);
+							CCListener ccl=new CCListener(dispatcher);
+							ChatMultiplexorGateway.this.chatlink=
+								new ChatMultiplexorLink(cmproplocation,ccl);
+							dispatcher.setChatLink(chatlink);
+//							ChatConnectorLauncher.main(new String[]{cmproplocation});
+//							for(Map.Entry<String,ChatConnector> pair:
+//								ChatConnectorLauncher.getConnectors().entrySet()){
+//								String key=pair.getKey();
+//								ChatConnector ccon=pair.getValue();
+//								new ChatMultiplexorChatConnDispatcher(key,ccon,listener);
+//							}
 						}catch(Throwable tr){
 							tr.printStackTrace();
 							listener.onError(ChatConnectorLauncher.class, tr);

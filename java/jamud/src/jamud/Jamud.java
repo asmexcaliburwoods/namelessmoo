@@ -466,7 +466,7 @@ public class Jamud implements Initializable {
 
 
 	/** Start the MUD */
-	public synchronized static int main(String[] args) {
+	public synchronized static void main(String[] args) {
 		String l=null;		
 		try {
 			l = (args.length == 0) ? Jamud.DEFAULT_INI : args[0];
@@ -476,12 +476,9 @@ public class Jamud implements Initializable {
 
 			//start me up!
 			instance.initialize();
-
-			return 0;
 		} catch(Exception e) {
 			e.printStackTrace();
 			System.err.println( "Jamud failed to load from '"+l+"'");
-			return 1;
 		}
 	}
 

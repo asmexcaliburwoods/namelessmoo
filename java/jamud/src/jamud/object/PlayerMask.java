@@ -1,6 +1,9 @@
 package jamud.object;
 
 
+import java.util.LinkedList;
+import java.util.List;
+
 import jamud.Jamud;
 import jamud.object.event.*;
 import jamud.util.FlagList;
@@ -11,10 +14,12 @@ import jamud.util.FlagList;
  * with other players.
  */
 public abstract class PlayerMask
-    implements JamudEventTrigger, JamudEventListener {
+implements JamudEventTrigger, JamudEventListener {
+	
+	private List<String> names=new LinkedList<String>();
 
-    
-    public static final int
+
+	public static final int
 	TRUST_0GUEST = 0,       //on a guest ID
 	TRUST_1NEWBIE = 1,      //early player
 	TRUST_2PLAYER = 2,      //normal player
@@ -22,9 +27,9 @@ public abstract class PlayerMask
 	TRUST_4IMMORTAL = 4,    //hired player, administrator
 	TRUST_5GOD = 5,         //between owner-op and hired
 	TRUST_6IMPLEMENTOR = 6; //owner-operator. big-daddy
-    
 
-    public static final int
+
+	public static final int
 	STATUS_DISCONNECTED = 0,
 	STATUS_CONNECTED = 1,
 	STATUS_AWAY = 2,
@@ -32,78 +37,78 @@ public abstract class PlayerMask
 
 
 
-    /** list of subscribed channels. Note that modifying this does not
-     * actually subscribe a PlayerMask to a channel's ChannelEvents.
-     * Rather, subscribing to a Channel will modify this FlagList.
-     */
-    public abstract FlagList subscribedChannels();
-
-    
-    /** is player on THIS mud? if not overridden returns true */
-    public boolean isLocal() {
-	return true;
-    }
+	/** list of subscribed channels. Note that modifying this does not
+	 * actually subscribe a PlayerMask to a channel's ChannelEvents.
+	 * Rather, subscribing to a Channel will modify this FlagList.
+	 */
+	public abstract FlagList subscribedChannels();
 
 
-    /** normally returns the name of the mud this mask is native to.
-     * if not overridden returns this mud's title
-     */
-    public String getLocale() {
-	return Jamud.currentInstance().getMessage(Jamud.MESSAGE_ID);
-    }
-
-
-    /** ShortName is local, LongName if not  */
-    public final String getName() {
-	if( this.isLocal() ) {
-	    return this.getShortName();
-	} else {
-	    return this.getLongName();
+	/** is player on THIS mud? if not overridden returns true */
+	public boolean isLocal() {
+		return true;
 	}
-    }
 
 
-    /** player's name */
-    public abstract String getShortName();
+	/** normally returns the name of the mud this mask is native to.
+	 * if not overridden returns this mud's title
+	 */
+	public String getLocale() {
+		return Jamud.currentInstance().getMessage(Jamud.MESSAGE_ID);
+	}
 
 
-    /** player's name and locale */
-    public final String getLongName() {
-	StringBuffer sb = new StringBuffer( this.getShortName() );
-	synchronized( sb ) {
-	    sb.append( "@" );
-	    sb.append( this.getLocale() );
-	    return sb.toString();
-	}	
-    }
+	/** ShortName is local, LongName if not  */
+	public final List<String> getNames() {
+		return names;
+	}
+
+	public void setNames(List<String> names) {
+		this.names=names;
+	}
 
 
-    /** player's title */
-    public abstract String getTitle();
+	/** player's name */
+	public String getDefaultName(){return getNames().get(0);}
+
+//
+//	/** player's name and locale */
+//	public final String getLongName() {
+//		StringBuffer sb = new StringBuffer( this.getShortName() );
+//		synchronized( sb ) {
+//			sb.append( "@" );
+//			sb.append( this.getLocale() );
+//			return sb.toString();
+//		}	
+//	}
 
 
-    /** player's info */
-    public abstract String getInfo();
-
-    
-    /** player's trust level */
-    public abstract int getTrust();
+	/** player's title */
+	public abstract String getTitle();
 
 
-    private int status;
+	/** player's info */
+	public abstract String getInfo();
 
-    /** players availability state */
-    public int getStatus() {
-	return this.status;
-    }
 
-    public void setStatus(int status) {
-	this.status = status;
-    }
+	/** player's trust level */
+	public abstract int getTrust();
 
-    
-    public final boolean equals(Object o) {
-	return (this == o);
-    }
+
+	private int status;
+
+	/** players availability state */
+	public int getStatus() {
+		return this.status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
+
+
+	public final boolean equals(Object o) {
+		return (this == o);
+	}
 
 }

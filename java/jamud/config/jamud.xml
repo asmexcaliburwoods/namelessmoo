@@ -3,13 +3,13 @@
 
     <MESSAGE NAME="jamud.title">namelessmoo</MESSAGE>
     <MESSAGE NAME="jamud.id">namelessmoo_id</MESSAGE>
-    <MESSAGE NAME="jamud.openscreen" SRC="config/jamud.open.txt" />
-    <MESSAGE NAME="jamud.closescreen" SRC="config/jamud.close.txt" />
-    <MESSAGE NAME="jamud.motd" SRC="config/jamud.motd.txt" />
+    <MESSAGE NAME="jamud.openscreen" SRC="jamud.open.txt" />
+    <MESSAGE NAME="jamud.closescreen" SRC="jamud.close.txt" />
+    <MESSAGE NAME="jamud.motd" SRC="jamud.motd.txt" />
 
 
 
-    <PLAYERMANAGER PATH="config/players/" />
+    <PLAYERMANAGER PATH="players/" />
 
 
 <!--
@@ -42,8 +42,8 @@
     <PLUGIN CLASS="com.jamud.commands.MudObjectCommandsPlugin" AUTO="TRUE" />
 
     <PLUGIN CLASS="com.jamud.commands.SocialsPlugin" AUTO="TRUE">
-        <SOCIALS SRC="config/socials.xml" />
-	<SOCIALS SRC="config/socials.new.xml" />
+        <SOCIALS SRC="socials.xml" />
+	<SOCIALS SRC="socials.new.xml" />
     </PLUGIN>
 
     <PLUGIN CLASS="com.jamud.commands.PlayerCommandsPlugin" AUTO="TRUE" />
@@ -59,7 +59,7 @@
 	nothing. The border between chaos and reality.
 	</DESC>
 
-        <OBJECT SRC="config/root/midgaard.xml" />
+        <OBJECT SRC="root/midgaard.xml" />
 
 	<ENTRANCE CLASS="Down" TARGET="midg 001" />
     </ROOT>
