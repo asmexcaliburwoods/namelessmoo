@@ -53,8 +53,8 @@ public class PlayerManager implements JamudEventTrigger {
 
 		for(Iterator i = masks.iterator(); i.hasNext(); ) {
 			PlayerMask p = (PlayerMask) i.next();
-			if( p.getName().equalsIgnoreCase(name) ) {
-				return p;
+			for(String pname:p.getNames()){
+				if( pname.equalsIgnoreCase(name) ) return p;
 			}
 		}
 		return null;
@@ -68,7 +68,7 @@ public class PlayerManager implements JamudEventTrigger {
 		PlayerMask pm=getPlayerMask(name);
 		if(pm!=null)return pm;
 		Player p=new Player(c);
-		p.setShortName(name);
+		p.getNames().add(name);
 		addPlayerMask(p);
 		return p;
 	}
@@ -84,7 +84,7 @@ public class PlayerManager implements JamudEventTrigger {
 
 		for(Iterator i = masks.iterator(); i.hasNext(); ) {
 			PlayerMask p = (PlayerMask) i.next();
-			if(p.getName().equalsIgnoreCase(name)) {
+			if(p.getDefaultName().equalsIgnoreCase(name)) {
 				i.remove();
 				return true;
 			}

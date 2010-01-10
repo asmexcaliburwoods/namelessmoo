@@ -208,7 +208,7 @@ public class Channel implements JamudEventTrigger {
 					    String text) {
 
 	char[] a = { ESCAPE_NAME, ESCAPE_TEXT };
-	String[] b = { source.getName(), text };
+	String[] b = { source.getDefaultName(), text };
 
 	return Util.escapeParse( a, b, '$', display );
     }

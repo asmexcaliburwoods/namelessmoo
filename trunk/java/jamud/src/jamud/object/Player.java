@@ -156,17 +156,17 @@ public class Player extends PlayerMask implements Initializable, Actor {
 
 	public synchronized MudObject obtainNativeBody() {
 		if(this.nativebody == null) {
-			String tid = this.name.concat("-body");
+			String tid = getDefaultName().concat("-body");
 			MudObject b = MudObject.getMudObjectTemplate(tid);
 			if( b == null ) {
 				try {
 					b = new MudObject();
 					b.setTemplateId( tid );
 					b.isTemplate( true );
-					b.setName( this.name );
-					b.getKeywords().add( this.name );
-					b.setDescription( "Look, it's ".concat(this.name) );
-					b.setShortDescription( this.name );
+					b.setName( getDefaultName() );
+					b.getKeywords().add( getDefaultName() );
+					b.setDescription( "Look, it's ".concat(getDefaultName()) );
+					b.setShortDescription( getDefaultName());
 					b.setSource( this.src.concat(".body") );
 				} catch( TemplateConflictException tce) {
 					tce.printStackTrace(); //if this happened, something is wrong.
@@ -192,7 +192,7 @@ public class Player extends PlayerMask implements Initializable, Actor {
 
 	public synchronized MudObjectContainer obtainHome() {
 		if(this.home == null) {
-			String tid = this.name.concat("-home");
+			String tid = this.getDefaultName().concat("-home");
 			MudObject m = MudObject.getMudObjectTemplate(tid);
 			if( m == null ) {
 				try {
@@ -215,19 +215,6 @@ public class Player extends PlayerMask implements Initializable, Actor {
 			return this.home.childContainer();
 		}
 	}
-
-
-	// PlayerMask: name
-	private String name = "";
-
-	public String getShortName() {
-		return this.name;
-	}
-
-	public void setShortName(String name) {
-		this.name = name;
-	}
-
 
 	// PlayerMask: title (similar to sdesc)
 	private String title = "";
@@ -258,7 +245,7 @@ public class Player extends PlayerMask implements Initializable, Actor {
 
 	public boolean verifyPassword(String test) {
 		if( test != null && this.pass != null ) {
-			MD5 m = new MD5( this.name.concat( test ) );
+			MD5 m = new MD5( test );
 			test = m.asHex();
 			m = null;
 			return test.equals( this.pass );
@@ -274,7 +261,7 @@ public class Player extends PlayerMask implements Initializable, Actor {
 		// first we check the oldpass for validity
 		if( oldpass != null && this.pass != null ) {
 			m.Init();
-			m.Update( this.name.concat( oldpass ) );
+			m.Update( oldpass );
 			oldpass = m.asHex();
 			if(! oldpass.equals( this.pass ) ) {
 				return false;
@@ -286,7 +273,7 @@ public class Player extends PlayerMask implements Initializable, Actor {
 		// and if we make it this far, we can change the pass
 		if( newpass != null ) {
 			m.Init();
-			m.Update( this.name.concat( newpass ) );
+			m.Update( newpass );
 			this.pass = m.asHex();
 		} else {
 			this.pass = null;
@@ -386,7 +373,9 @@ public class Player extends PlayerMask implements Initializable, Actor {
 	 * and the interpreters will be polled for a match.
 	 */
 	public synchronized void enact(String command) {
+		System.out.println("enact: "+command);
 		if(this.state < STATE_INITIALIZED) {
+			System.out.println("enact: not inited. fail");
 			return;
 		}
 
@@ -444,9 +433,9 @@ public class Player extends PlayerMask implements Initializable, Actor {
 			//p = 
 
 		} else {
-			p = ( ( this.name == null )
-					? "[jamud]$ "
-							: "[".concat(this.name).concat("]$ ")
+			p = ( ( getDefaultName() == null )
+					? ": "
+							: "[".concat(this.getDefaultName()).concat("]: ")
 			);
 		}
 
@@ -507,7 +496,7 @@ public class Player extends PlayerMask implements Initializable, Actor {
 		if( (t=jamud.getMessage(MESSAGE_LOGIN_NAME)) == null ) {
 			t = "Player Name: ";
 		}
-		this.name = this.prompt( t ).toLowerCase();
+		getNames().add(0, this.prompt( t ).toLowerCase());
 
 		boolean exists = true;
 
@@ -515,7 +504,7 @@ public class Player extends PlayerMask implements Initializable, Actor {
 
 			// resolve our playerfile from the path and our name
 			t = jamud.playerManager().getPath();
-			this.src = t.concat(this.name);
+			this.src = t.concat(getDefaultName());
 
 			// load from playerfile
 			this.load();
@@ -549,8 +538,7 @@ public class Player extends PlayerMask implements Initializable, Actor {
 			}
 
 			// find a previous instance of this mask by name
-			PlayerMask prev = jamud.playerManager()
-			.getPlayerMask(this.getName());
+			PlayerMask prev = jamud.playerManager().getPlayerMask(getDefaultName());
 
 			// is this player already logged in?
 			if(prev != null && prev instanceof Player) {
@@ -650,8 +638,8 @@ public class Player extends PlayerMask implements Initializable, Actor {
 		jamud.playerManager().logPlayerMaskIn( this );
 
 		// subscribe channels
-		for(Iterator i = channels.iterator(); i.hasNext(); ) {
-			String n = (String) i.next();
+		for(Iterator<String> i = channels.iterator(); i.hasNext(); ) {
+			String n = i.next();
 			Channel c = (Channel) jamud.channelManager().getChannel( n );
 			if(c != null) {
 				try {
@@ -705,7 +693,7 @@ public class Player extends PlayerMask implements Initializable, Actor {
 		Creation creation = Jamud.currentInstance().getCreation();
 		if( creation != null) {
 			try {
-				System.out.println( " enacting Creation" );
+				System.out.println( " enacting Creation: "+creation.getClass() );
 				creation.enact( this );
 				try {
 					this.save();
@@ -725,9 +713,7 @@ public class Player extends PlayerMask implements Initializable, Actor {
 			}
 
 		} else {
-
-			// no creation
-			System.out.println(" no creation");
+			new NullPointerException().printStackTrace();
 			System.out.println("end: Player.creation() [false]");
 			return false;
 		}
@@ -776,7 +762,7 @@ public class Player extends PlayerMask implements Initializable, Actor {
 
 			// tell stuff
 			TellEvent t = (TellEvent) event;
-			this.println( t.getSource().getName().concat(" tells you, \"")
+			this.println( t.getSource().getDefaultName().concat(" tells you, \"")
 					.concat( t.getText() ).concat("\"") );
 			this.ready();
 
@@ -843,7 +829,7 @@ public class Player extends PlayerMask implements Initializable, Actor {
 		System.out.println("begin: Player.load(IXMLElement)");
 
 		Attributes at = new Attributes(xml.getAttributes());
-		this.name = at.getAttribute( PROPERTY_NAME, this.name );
+		getNames().add(0,at.getAttribute( PROPERTY_NAME, getDefaultName()));
 		this.trust = at.getAttribute( PROPERTY_TRUST, 1 );
 
 		IXMLElement nxt;
@@ -893,7 +879,7 @@ public class Player extends PlayerMask implements Initializable, Actor {
 
 		// attempt to find Home
 		MudObject m = MudObject
-		.getMudObjectTemplate( this.name.concat("-home") );
+		.getMudObjectTemplate( getDefaultName().concat("-home") );
 		if( m == null ) {
 			nxt = xml.getFirstChildNamed( "HOME" );
 			if(nxt != null) {
@@ -906,7 +892,7 @@ public class Player extends PlayerMask implements Initializable, Actor {
 		}
 
 		// attempt to find Native Body
-		m = MudObject.getMudObjectTemplate( this.name.concat("-body") );
+		m = MudObject.getMudObjectTemplate( getDefaultName().concat("-body") );
 		if( m == null ) {
 			nxt = xml.getFirstChildNamed( "BODY" );
 			if(nxt != null) {
@@ -974,8 +960,8 @@ public class Player extends PlayerMask implements Initializable, Actor {
 
 	private void _toXMLElement(IXMLElement xml) {
 		//name, trust, state
-		if(this.name != null) {
-			xml.setAttribute( PROPERTY_NAME, this.name );
+		if(getDefaultName() != null) {
+			xml.setAttribute( PROPERTY_NAME, getDefaultName());
 		}
 		xml.setAttribute( PROPERTY_TRUST, Integer.toString(this.trust) );
 

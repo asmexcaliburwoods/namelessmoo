@@ -1,21 +1,17 @@
 +------------------------------------------------------------------------------+
-                               _)\\.-.
-              .-.__,___,_.-=-. )\\`  a`\\_
-          .-.__\\__,__,__.-=-. `/  \\     `\\
-          {~,-~-,-~.-~,-,;;;;\\ |   '--;`)/
-           \\-,~_-~_-,~-,(_(_(;\\/   ,;/
-            ",-.~_,-~,-~,)_)_)'.  ;;(               W E L C O M E
-              `~-,_-~,-~(_(_(_(_\\  `;\\                   t o
-        ,          `"~~--,)_)_)_)\\_   \\               namelessmoo
-        |\\              (_(_/_(_,   \\  ;
-        \\ '-.       _.--'  /_/_/_)   | |
-         '--.\\    .'          /_/    | |
-             ))  /       \\      |   /.'
-            //  /,        | __.'|  ||
-           //   ||        /`    (  ||           the java-based mud in
-          ||    ||      .'       \\ \\\\           T E C H N I C O L O R
-          ||    ||    .'_         \\ \\\\						
-           \\\\   //   / _ `\\        \\ \\\\__					based on JaMUD
-            \'-'/(   _  `\\,;        \\ '--:,
-             `"`  `"` `-,,;         `"`",,;
+W E L C O M E
+t o
+namelessmoo
+
+the java-based mud in
+T E C H N I C O L O R
+
+based on JaMUD
+
+to advertise namelessmoo to someone on icq network, type and send:
+ad to icq SOMEONE'S_ICQ_NUMBER
+for example:
+ad to icq 12345678
+
+note: do not use valuable passwords, since they are reflected in the private logs
 +------------------------------------------------------------------------------+
